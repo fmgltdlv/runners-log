@@ -68,6 +68,11 @@ export default function SettingsScreen({ settings, onUpdateSettings }) {
           <p className="hint warning">Notifications blocked — enable in browser settings</p>
         )}
 
+        <p className="hint">
+          On Android, install this app to your home screen and disable battery optimization for
+          Chrome if interval alerts are missed.
+        </p>
+
         <label className="toggle-row">
           <span>
             <strong>Track GPS (optional)</strong>

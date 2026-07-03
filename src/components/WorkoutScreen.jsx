@@ -95,6 +95,22 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
     }
   }, [timer.isComplete, saveCompletedRun]);
 
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (
+        document.visibilityState === 'hidden' &&
+        timer.status === 'running' &&
+        settings.notifications &&
+        workout
+      ) {
+        syncNotificationSchedule(timer.elapsed);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [timer.status, timer.elapsed, settings.notifications, workout, syncNotificationSchedule]);
+
   const handlePause = async () => {
     const elapsed = timer.pause();
     if (settings.notifications) {
