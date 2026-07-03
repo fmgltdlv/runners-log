@@ -1,5 +1,5 @@
-// Classic Couch to 5K program (times in seconds)
-// Each workout: 5 min warmup walk, intervals, 5 min cooldown walk
+// Official Couch to 5K program from https://c25k.com/c25k_plan/
+// Each workout: 5 min brisk warmup walk, intervals, 5 min cooldown walk
 
 const WARMUP = 5 * 60;
 const COOLDOWN = 5 * 60;
@@ -150,20 +150,20 @@ export const C25K_PROGRAM = {
       week: 6,
       days: [
         workout(
-          repeat(
-            [
-              { type: 'run', duration: 300 },
-              { type: 'walk', duration: 180 },
-            ],
-            3,
-          ),
+          [
+            { type: 'run', duration: 300 },
+            { type: 'walk', duration: 180 },
+            { type: 'run', duration: 480 },
+            { type: 'walk', duration: 180 },
+            { type: 'run', duration: 300 },
+          ],
           'Day 1',
         ),
         workout(
           [
-            { type: 'run', duration: 480 },
+            { type: 'run', duration: 600 },
             { type: 'walk', duration: 180 },
-            { type: 'run', duration: 480 },
+            { type: 'run', duration: 600 },
           ],
           'Day 2',
         ),
@@ -174,44 +174,23 @@ export const C25K_PROGRAM = {
       week: 7,
       days: [
         workout([{ type: 'run', duration: 1500 }], 'Day 1'),
-        workout([{ type: 'run', duration: 1800 }], 'Day 2'),
-        workout([{ type: 'run', duration: 2100 }], 'Day 3'),
+        workout([{ type: 'run', duration: 1500 }], 'Day 2'),
+        workout([{ type: 'run', duration: 1500 }], 'Day 3'),
       ],
     },
     {
       week: 8,
       days: [
-        workout(
-          [
-            { type: 'run', duration: 1200 },
-            { type: 'walk', duration: 300 },
-            { type: 'run', duration: 1200 },
-          ],
-          'Day 1',
-        ),
-        workout(
-          [
-            { type: 'run', duration: 1200 },
-            { type: 'walk', duration: 300 },
-            { type: 'run', duration: 1200 },
-          ],
-          'Day 2',
-        ),
-        workout(
-          [
-            { type: 'run', duration: 1200 },
-            { type: 'walk', duration: 300 },
-            { type: 'run', duration: 1200 },
-          ],
-          'Day 3',
-        ),
+        workout([{ type: 'run', duration: 1680 }], 'Day 1'),
+        workout([{ type: 'run', duration: 1680 }], 'Day 2'),
+        workout([{ type: 'run', duration: 1680 }], 'Day 3'),
       ],
     },
     {
       week: 9,
       days: [
         workout([{ type: 'run', duration: 1800 }], 'Day 1'),
-        workout([{ type: 'run', duration: 2100 }], 'Day 2'),
+        workout([{ type: 'run', duration: 1800 }], 'Day 2'),
         workout([{ type: 'run', duration: 1800 }], 'Day 3'),
       ],
     },
