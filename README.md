@@ -30,3 +30,6 @@ npm run preview
 ## Deploy
 
 Build the `dist/` folder and deploy to any static host (Netlify, Cloudflare Pages, GitHub Pages, etc.). HTTPS is required for PWA features.
+
+## **FUTURE IMPROVEMENT**
+dedicated app functionality
