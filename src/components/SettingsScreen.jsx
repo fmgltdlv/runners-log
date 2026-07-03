@@ -46,7 +46,7 @@ export default function SettingsScreen({ settings, onUpdateSettings }) {
         <label className="toggle-row">
           <span>
             <strong>Interval notifications</strong>
-            <small>System notification sound when intervals change</small>
+            <small>Scheduled via service worker — works best installed on Android</small>
           </span>
           <input
             type="checkbox"

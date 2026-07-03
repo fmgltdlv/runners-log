@@ -1,18 +1,16 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { getWorkout } from '../data/c25k';
+import { segmentLabel } from '../lib/workoutEngine';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { useWorkoutTimer } from '../hooks/useWorkoutTimer';
 import { createRunId, saveRun } from '../utils/db';
 import { formatDistance, formatDuration, formatPace } from '../utils/format';
-import { notifyIntervalChange, playCueSound } from '../utils/notifications';
-
-function segmentLabel(segment) {
-  if (!segment) return '';
-  if (segment.phase === 'warmup') return 'Warm up';
-  if (segment.phase === 'cooldown') return 'Cool down';
-  return segment.type === 'run' ? 'Run' : 'Walk';
-}
+import { playCueSound } from '../utils/notifications';
+import {
+  cancelWorkoutNotifications,
+  scheduleWorkoutNotifications,
+} from '../utils/workoutNotifications';
 
 export default function WorkoutScreen({ settings, week, day, onFinish }) {
   const workout = getWorkout(week, day);
@@ -21,32 +19,32 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
 
   const handleIntervalChange = useCallback(
     (segment) => {
-      const label = segmentLabel(segment);
-      const type = segment.type;
-
       if (settings.soundCues) {
-        playCueSound(type);
-      }
-
-      if (settings.notifications) {
-        notifyIntervalChange(`${label}!`, `Switch to ${segment.type === 'run' ? 'running' : 'walking'}.`);
+        playCueSound(segment.type);
       }
     },
-    [settings.soundCues, settings.notifications],
+    [settings.soundCues],
   );
+
+  const handleComplete = useCallback(() => {
+    if (settings.soundCues) playCueSound('run');
+  }, [settings.soundCues]);
 
   const timer = useWorkoutTimer(workout, {
     onIntervalChange: handleIntervalChange,
-    onComplete: () => {
-      if (settings.soundCues) playCueSound('run');
-      if (settings.notifications) {
-        notifyIntervalChange('Workout complete!', 'Great job — you finished this session.');
-      }
-    },
+    onComplete: handleComplete,
   });
 
   const geo = useGeolocation(settings.enableGps && timer.status === 'running');
   const wakeLock = useWakeLock(settings.keepScreenOn && timer.status === 'running');
+
+  const syncNotificationSchedule = useCallback(
+    async (elapsedSeconds = timer.elapsed) => {
+      if (!settings.notifications || !workout) return;
+      await scheduleWorkoutNotifications(workout, elapsedSeconds);
+    },
+    [settings.notifications, workout, timer.elapsed],
+  );
 
   const saveCompletedRun = useCallback(async () => {
     if (savedRef.current) return;
@@ -68,18 +66,52 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
   }, [week, day, workout, timer.elapsed, timer.isComplete, geo.distance, geo.track]);
 
   useEffect(() => {
-    if (timer.status === 'idle') {
+    let cancelled = false;
+
+    const startWorkout = async () => {
+      if (timer.status !== 'idle') return;
       timer.start();
-    }
+
+      if (settings.notifications && workout && !cancelled) {
+        if ('serviceWorker' in navigator) {
+          await navigator.serviceWorker.ready;
+        }
+        await syncNotificationSchedule(0);
+      }
+    };
+
+    startWorkout();
+
+    return () => {
+      cancelled = true;
+      cancelWorkoutNotifications();
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (timer.isComplete) {
+      cancelWorkoutNotifications();
       saveCompletedRun();
     }
   }, [timer.isComplete, saveCompletedRun]);
 
+  const handlePause = async () => {
+    const elapsed = timer.pause();
+    if (settings.notifications) {
+      await cancelWorkoutNotifications();
+    }
+    return elapsed;
+  };
+
+  const handleResume = async () => {
+    timer.resume();
+    if (settings.notifications) {
+      await syncNotificationSchedule(timer.elapsed);
+    }
+  };
+
   const handleEnd = async () => {
+    await cancelWorkoutNotifications();
     if (timer.elapsed > 30) {
       await saveCompletedRun();
     }
@@ -154,6 +186,9 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
         )}
       </div>
 
+      {settings.notifications && (
+        <p className="hint">Interval alerts are scheduled in the background.</p>
+      )}
       {settings.enableGps && geo.error && (
         <p className="hint warning">GPS: {geo.error}</p>
       )}
@@ -163,12 +198,12 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
 
       <div className="workout-actions">
         {timer.status === 'running' && (
-          <button className="btn btn-secondary" onClick={timer.pause}>
+          <button className="btn btn-secondary" onClick={handlePause}>
             Pause
           </button>
         )}
         {timer.status === 'paused' && (
-          <button className="btn btn-primary" onClick={timer.resume}>
+          <button className="btn btn-primary" onClick={handleResume}>
             Resume
           </button>
         )}
