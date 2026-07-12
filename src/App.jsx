@@ -16,6 +16,20 @@ export default function App() {
     setActiveWorkout({ week: settings.week, day: settings.day });
   };
 
+  const continueWorkout = (run) => {
+    setActiveWorkout({
+      week: run.week,
+      day: run.day,
+      resumeState: {
+        runId: run.id,
+        elapsed: run.durationSeconds,
+        startedAt: run.startedAt,
+        track: run.track ?? [],
+        distanceMeters: run.distanceMeters ?? 0,
+      },
+    });
+  };
+
   const finishWorkout = () => {
     setActiveWorkout(null);
     setActiveTab('history');
@@ -27,6 +41,7 @@ export default function App() {
         settings={settings}
         week={activeWorkout.week}
         day={activeWorkout.day}
+        resumeState={activeWorkout.resumeState ?? null}
         onFinish={finishWorkout}
       />
     );
@@ -38,7 +53,7 @@ export default function App() {
         {activeTab === 'home' && (
           <HomeScreen settings={settings} onUpdateSettings={update} onStartWorkout={startWorkout} />
         )}
-        {activeTab === 'history' && <HistoryScreen />}
+        {activeTab === 'history' && <HistoryScreen onContinueWorkout={continueWorkout} />}
         {activeTab === 'settings' && (
           <SettingsScreen settings={settings} onUpdateSettings={update} />
         )}

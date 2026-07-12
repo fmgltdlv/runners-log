@@ -303,6 +303,15 @@ select {
   margin-top: auto;
 }
 
+.workout-skip-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.workout-skip-actions .btn {
+  flex: 1;
+}
+
 .hint {
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -347,6 +356,16 @@ select {
   margin-top: 0.75rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.run-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.run-card-actions .btn-small {
+  margin-top: 0;
 }
 
 .badge {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { deleteRun, getRuns } from '../utils/db';
 import { formatDate, formatDistance, formatDuration } from '../utils/format';
 
-export default function HistoryScreen() {
+export default function HistoryScreen({ onContinueWorkout }) {
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,9 +55,16 @@ export default function HistoryScreen() {
               <span>{formatDuration(run.durationSeconds)}</span>
               {run.distanceMeters > 0 && <span>{formatDistance(run.distanceMeters)}</span>}
             </div>
-            <button className="btn btn-ghost btn-small" onClick={() => handleDelete(run.id)}>
-              Delete
-            </button>
+            <div className="run-card-actions">
+              {!run.completed && onContinueWorkout && (
+                <button className="btn btn-primary btn-small" onClick={() => onContinueWorkout(run)}>
+                  Continue
+                </button>
+              )}
+              <button className="btn btn-ghost btn-small" onClick={() => handleDelete(run.id)}>
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
