@@ -14,10 +14,11 @@ function segmentLabel(segment) {
   return segment.type === 'run' ? 'Run' : 'Walk';
 }
 
-export default function WorkoutScreen({ settings, week, day, onFinish }) {
+export default function WorkoutScreen({ settings, week, day, onFinish, resumeState = null }) {
   const workout = getWorkout(week, day);
-  const startedAtRef = useRef(new Date().toISOString());
+  const startedAtRef = useRef(resumeState?.startedAt ?? new Date().toISOString());
   const savedRef = useRef(false);
+  const runIdRef = useRef(resumeState?.runId ?? null);
 
   const handleIntervalChange = useCallback(
     (segment) => {
@@ -45,7 +46,10 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
     },
   });
 
-  const geo = useGeolocation(settings.enableGps && timer.status === 'running');
+  const geo = useGeolocation(settings.enableGps && timer.status === 'running', {
+    initialTrack: resumeState?.track ?? [],
+    initialDistance: resumeState?.distanceMeters ?? 0,
+  });
   const wakeLock = useWakeLock(settings.keepScreenOn && timer.status === 'running');
 
   const saveCompletedRun = useCallback(async () => {
@@ -53,7 +57,7 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
     savedRef.current = true;
 
     await saveRun({
-      id: createRunId(),
+      id: runIdRef.current ?? createRunId(),
       program: 'C25K',
       week,
       day,
@@ -69,7 +73,7 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
 
   useEffect(() => {
     if (timer.status === 'idle') {
-      timer.start();
+      timer.start(resumeState?.elapsed ?? 0);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -162,6 +166,20 @@ export default function WorkoutScreen({ settings, week, day, onFinish }) {
       )}
 
       <div className="workout-actions">
+        {(timer.canSkipWarmup || timer.canSkipCooldown) && !timer.isComplete && (
+          <div className="workout-skip-actions">
+            {timer.canSkipWarmup && (
+              <button className="btn btn-secondary" onClick={timer.skipWarmup}>
+                Skip warmup
+              </button>
+            )}
+            {timer.canSkipCooldown && (
+              <button className="btn btn-secondary" onClick={timer.skipCooldown}>
+                Skip cooldown
+              </button>
+            )}
+          </div>
+        )}
         {timer.status === 'running' && (
           <button className="btn btn-secondary" onClick={timer.pause}>
             Pause

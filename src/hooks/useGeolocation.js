@@ -15,14 +15,14 @@ function haversineMeters(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-export function useGeolocation(enabled) {
-  const [position, setPosition] = useState(null);
-  const [track, setTrack] = useState([]);
-  const [distance, setDistance] = useState(0);
+export function useGeolocation(enabled, { initialTrack = [], initialDistance = 0 } = {}) {
+  const [position, setPosition] = useState(initialTrack.at(-1) ?? null);
+  const [track, setTrack] = useState(initialTrack);
+  const [distance, setDistance] = useState(initialDistance);
   const [error, setError] = useState(null);
   const [tracking, setTracking] = useState(false);
   const watchIdRef = useRef(null);
-  const lastPointRef = useRef(null);
+  const lastPointRef = useRef(initialTrack.at(-1) ?? null);
 
   const reset = useCallback(() => {
     setPosition(null);
