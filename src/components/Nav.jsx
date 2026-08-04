@@ -1,6 +1,7 @@
 export default function Nav({ activeTab, onTabChange }) {
   const tabs = [
-    { id: 'home', label: 'Train' },
+    { id: 'home', label: 'Run' },
+    { id: 'lift', label: 'Lift' },
     { id: 'history', label: 'History' },
     { id: 'settings', label: 'Settings' },
   ];

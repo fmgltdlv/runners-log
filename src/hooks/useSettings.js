@@ -5,6 +5,8 @@ const STORAGE_KEY = 'runners-log-settings';
 const defaults = {
   week: 1,
   day: 1,
+  strengthPlanId: 'machine-full-body',
+  strengthDay: 1,
   keepScreenOn: true,
   enableGps: false,
   soundCues: true,
