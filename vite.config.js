@@ -11,7 +11,7 @@ export default defineConfig({
       manifest: {
         name: 'Runners Log',
         short_name: 'Runners Log',
-        description: 'Couch to 5K running tracker',
+        description: 'Couch to 5K running tracker and strength training',
         theme_color: '#0f766e',
         background_color: '#0c1222',
         display: 'standalone',
@@ -41,4 +41,12 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true,
+      },
+    },
+  },
 });

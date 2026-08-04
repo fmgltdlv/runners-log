@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import HistoryScreen from './components/HistoryScreen';
 import HomeScreen from './components/HomeScreen';
+import LiftScreen from './components/LiftScreen';
 import Nav from './components/Nav';
 import SettingsScreen from './components/SettingsScreen';
+import StrengthWorkoutScreen from './components/StrengthWorkoutScreen';
 import WorkoutScreen from './components/WorkoutScreen';
 import { useSettings } from './hooks/useSettings';
 import './App.css';
@@ -11,9 +13,14 @@ export default function App() {
   const { settings, update } = useSettings();
   const [activeTab, setActiveTab] = useState('home');
   const [activeWorkout, setActiveWorkout] = useState(null);
+  const [activeStrengthWorkout, setActiveStrengthWorkout] = useState(null);
 
   const startWorkout = () => {
     setActiveWorkout({ week: settings.week, day: settings.day });
+  };
+
+  const startStrengthWorkout = ({ planId, day }) => {
+    setActiveStrengthWorkout({ planId, day });
   };
 
   const continueWorkout = (run) => {
@@ -35,6 +42,22 @@ export default function App() {
     setActiveTab('history');
   };
 
+  const finishStrengthWorkout = () => {
+    setActiveStrengthWorkout(null);
+    setActiveTab('history');
+  };
+
+  if (activeStrengthWorkout) {
+    return (
+      <StrengthWorkoutScreen
+        settings={settings}
+        planId={activeStrengthWorkout.planId}
+        day={activeStrengthWorkout.day}
+        onFinish={finishStrengthWorkout}
+      />
+    );
+  }
+
   if (activeWorkout) {
     return (
       <WorkoutScreen
@@ -52,6 +75,13 @@ export default function App() {
       <main className="app-main">
         {activeTab === 'home' && (
           <HomeScreen settings={settings} onUpdateSettings={update} onStartWorkout={startWorkout} />
+        )}
+        {activeTab === 'lift' && (
+          <LiftScreen
+            settings={settings}
+            onUpdateSettings={update}
+            onStartWorkout={startStrengthWorkout}
+          />
         )}
         {activeTab === 'history' && <HistoryScreen onContinueWorkout={continueWorkout} />}
         {activeTab === 'settings' && (

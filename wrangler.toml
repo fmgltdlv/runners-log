@@ -1,0 +1,19 @@
+name = "runners-log"
+main = "worker/index.js"
+compatibility_date = "2026-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "runners-log-db"
+database_id = "00000000-0000-0000-0000-000000000001"
+preview_database_id = "local"
+migrations_dir = "migrations"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[dev]
+port = 8787
